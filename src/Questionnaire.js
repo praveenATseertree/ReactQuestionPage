@@ -16,15 +16,24 @@ const Questionnaire = () => {
   ];
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState([]);
+  const [responses, setResponses] = useState(Array(questions.length).fill(''));
 
   const handleResponse = (response) => {
-    setResponses([...responses, response]);
+    const newResponses = [...responses];
+    newResponses[currentQuestionIndex] = response;
+    setResponses(newResponses);
+
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
       // All questions answered
       alert('All questions answered. You can submit now.');
+    }
+  };
+
+  const handleBack = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
 
@@ -37,7 +46,7 @@ const Questionnaire = () => {
     <div className="questionnaire-container">
       <div className="header">
         <div className="back-button">
-          <a href="#">Back</a>
+          {currentQuestionIndex > 0 && <a href="#" onClick={handleBack}>Back</a>}
         </div>
       </div>
       <div className="greeting">
