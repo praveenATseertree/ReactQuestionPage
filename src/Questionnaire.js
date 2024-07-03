@@ -42,8 +42,16 @@ const Questionnaire = () => {
     // Add logic to handle the submission of responses
   };
 
+  // Calculate progress percentage
+  const progressPercentage = ((currentQuestionIndex + 1) / questions.length) * 100;
+
   return (
     <div className="questionnaire-container">
+      <div className="progress-bar-container">
+        <div className="progress-bar" style={{ width: `${progressPercentage}%` }}>
+          <span className="progress-text">{Math.round(progressPercentage)}%</span>
+        </div>
+      </div>
       <div className="header">
         <div className="back-button">
           {currentQuestionIndex > 0 && <a href="#" onClick={handleBack}>Back</a>}
