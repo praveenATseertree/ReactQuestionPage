@@ -6,7 +6,17 @@ class Questionnaire extends Component {
     super(props);
     this.state = {
       currentQuestionIndex: 0,
-      responses: Array(10).fill(''),
+      responses: Array(7).fill(''),
+      firstName: '',
+      lastName: '',
+      companyName: '',
+      companyShortCode: '',
+      country: '',
+      baseCurrency: '',
+      financialYear: '',
+      accountingPeriodMonth: '',
+      accountingPeriodYear: '',
+      termsAccepted: false
     };
   }
 
@@ -14,10 +24,9 @@ class Questionnaire extends Component {
     const { currentQuestionIndex, responses } = this.state;
     const newResponses = [...responses];
     newResponses[currentQuestionIndex] = response;
-
     this.setState({ responses: newResponses });
 
-    if (currentQuestionIndex < this.questions.length - 1) {
+    if (currentQuestionIndex < 6) {
       this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
     } else {
       // All questions answered
@@ -32,29 +41,35 @@ class Questionnaire extends Component {
     }
   };
 
+  handleInputChange = (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
+  };
+
+  handleCheckboxChange = (event) => {
+    const { checked } = event.target;
+    this.setState({ termsAccepted: checked });
+  };
+
   handleSubmit = () => {
     console.log('User responses:', this.state.responses);
     // Add logic to handle the submission of responses
+    // This can include API calls or further processing of collected data
   };
-
-  questions = [
-    'Have you used software to manage or engage with customers before?',
-    'Do you find it easy to navigate most software interfaces?',
-    'Have you ever customized software to better fit your needs?',
-    'Do you prefer cloud-based or on-premise solutions?',
-    'How frequently do you use customer management software?',
-    'Do you consider yourself tech-savvy?',
-    'Have you received training for any customer management software?',
-    'Do you value software that integrates with other tools you use?',
-    'Have you ever faced issues with data security in software?',
-    'Do you prefer software with extensive customization options?'
-  ];
 
   render() {
     const { currentQuestionIndex } = this.state;
+    const progressPercentage = ((currentQuestionIndex + 1) / 7) * 100;
 
-    // Calculate progress percentage
-    const progressPercentage = ((currentQuestionIndex + 1) / this.questions.length) * 100;
+    const questions = [
+      'Confirm your first name and last name',
+      'Please enter the name of your Company',
+      'Please select your Country',
+      'Please select your Base Currency',
+      'Please select your Financial Year',
+      'What would you like your first accounting period to be?',
+      'Before we get started, please take a moment to review and accept our Terms and Conditions'
+    ];
 
     return (
       <div className="questionnaire-container">
@@ -68,22 +83,136 @@ class Questionnaire extends Component {
             {currentQuestionIndex > 0 && <a href="#" onClick={this.handleBack}>Back</a>}
           </div>
         </div>
-        <div className="greeting">
-          <h2>Nice to meet you Praveen!</h2>
-        </div>
         <div className="question">
-          <h1>{this.questions[currentQuestionIndex]}</h1>
-          <p>Your answer will help us to give you the best start.</p>
+          <h1>{questions[currentQuestionIndex]}</h1>
+          {currentQuestionIndex === 0 && (
+            <div className="name-inputs">
+              <input
+                type="text"
+                name="firstName"
+                placeholder="First name"
+                value={this.state.firstName}
+                onChange={this.handleInputChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="lastName"
+                placeholder="Last name"
+                value={this.state.lastName}
+                onChange={this.handleInputChange}
+                className="input-field"
+              />
+            </div>
+          )}
+          {currentQuestionIndex === 1 && (
+            <div className="company-inputs">
+              <input
+                type="text"
+                name="companyName"
+                placeholder="Company Name"
+                value={this.state.companyName}
+                onChange={this.handleInputChange}
+                className="input-field"
+              />
+              <input
+                type="text"
+                name="companyShortCode"
+                placeholder="Company Short Code"
+                value={this.state.companyShortCode}
+                onChange={this.handleInputChange}
+                className="input-field"
+              />
+            </div>
+          )}
+          {currentQuestionIndex === 2 && (
+            <input
+              type="text"
+              name="country"
+              placeholder="Country"
+              value={this.state.country}
+              onChange={this.handleInputChange}
+              className="input-field"
+            />
+          )}
+          {currentQuestionIndex === 3 && (
+            <input
+              type="text"
+              name="baseCurrency"
+              placeholder="Base Currency"
+              value={this.state.baseCurrency}
+              onChange={this.handleInputChange}
+              className="input-field"
+            />
+          )}
+          {currentQuestionIndex === 4 && (
+            <select
+              name="financialYear"
+              value={this.state.financialYear}
+              onChange={this.handleInputChange}
+              className="input-field"
+            >
+              <option value="Jan-Dec">Jan-Dec</option>
+              <option value="Apr-Mar">Apr-Mar</option>
+            </select>
+          )}
+          {currentQuestionIndex === 5 && (
+            <div className="accounting-period-inputs">
+              <select
+                name="accountingPeriodMonth"
+                value={this.state.accountingPeriodMonth}
+                onChange={this.handleInputChange}
+                className="input-field"
+              >
+                {/* Options for months */}
+                <option value="January">January</option>
+                {/* Add other months */}
+              </select>
+              <select
+                name="accountingPeriodYear"
+                value={this.state.accountingPeriodYear}
+                onChange={this.handleInputChange}
+                className="input-field"
+              >
+                {/* Options for years */}
+                <option value="2024">2024</option>
+                {/* Add other years */}
+              </select>
+            </div>
+          )}
+          {currentQuestionIndex === 6 && (
+            <div className="terms-inputs">
+              <input
+                type="checkbox"
+                id="termsCheckbox"
+                name="termsAccepted"
+                checked={this.state.termsAccepted}
+                onChange={this.handleCheckboxChange}
+                className="checkbox-input"
+              />
+              <label htmlFor="termsCheckbox" className="terms-label">
+                I agree to the Terms and Conditions
+              </label>
+            </div>
+          )}
         </div>
         <div className="response-buttons">
-          <button onClick={() => this.handleResponse('Yes')}>Yes</button>
-          <button onClick={() => this.handleResponse('No')}>No</button>
+          {currentQuestionIndex !== 6 && (
+            <>
+              <button onClick={() => this.handleResponse('Yes')} className="response-button">Yes</button>
+              <button onClick={() => this.handleResponse('No')} className="response-button">No</button>
+            </>
+          )}
+          {currentQuestionIndex === 6 && (
+            <button
+              onClick={this.handleSubmit}
+              disabled={!this.state.termsAccepted}
+              className="submit-button"
+            >
+              Complete Sign-up
+            </button>
+          )}
         </div>
-        {currentQuestionIndex === this.questions.length - 1 && (
-          <div className="submit-button">
-            <button onClick={this.handleSubmit}>Submit</button>
-          </div>
-        )}
       </div>
     );
   }
