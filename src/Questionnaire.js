@@ -73,18 +73,25 @@ class Questionnaire extends Component {
 
     return (
       <div className="questionnaire-container">
-        <div className="progress-bar-container">
-          <div className="progress-bar" style={{ width: `${progressPercentage}%` }}>
-            <span className="progress-text">{Math.round(progressPercentage)}%</span>
-          </div>
-        </div>
         <div className="header">
-          <div className="back-button">
-            {currentQuestionIndex > 0 && <a href="#" onClick={this.handleBack}>Back</a>}
+          <div className="progress-bar-container">
+            <div className="progress-bar" style={{ width: `${progressPercentage}%` }}>
+              <span className="progress-text">{Math.round(progressPercentage)}%</span>
+            </div>
           </div>
         </div>
+
+        <div className="back-button">
+          {currentQuestionIndex > 0 && <a href="#" onClick={this.handleBack}>Back</a>}
+        </div>
+
+        <div className="greeting">
+          <h2>Nice to meet you Praveen!</h2>
+        </div>
+       
         <div className="question">
           <h1>{questions[currentQuestionIndex]}</h1>
+          <p>Your answer will help us to give you the best start.</p>
           {currentQuestionIndex === 0 && (
             <div className="name-inputs">
               <input
