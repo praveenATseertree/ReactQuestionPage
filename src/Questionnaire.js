@@ -6,30 +6,26 @@ class Questionnaire extends Component {
     super(props);
     this.state = {
       currentQuestionIndex: 0,
-      responses: Array(7).fill(''),
-      firstName: '',
-      lastName: '',
-      companyName: '',
-      companyShortCode: '',
-      country: '',
-      baseCurrency: '',
-      financialYear: '',
-      accountingPeriodMonth: '',
-      accountingPeriodYear: '',
-      termsAccepted: false
+      Questionnaire_Response: {
+        firstName: '',
+        lastName: '',
+        companyName: '',
+        companyShortCode: '',
+        country: '',
+        baseCurrency: '',
+        financialYear: '',
+        accountingPeriodMonth: '',
+        accountingPeriodYear: '',
+        termsAccepted: false
+      }
     };
   }
 
-  handleResponse = (response) => {
-    const { currentQuestionIndex, responses } = this.state;
-    const newResponses = [...responses];
-    newResponses[currentQuestionIndex] = response;
-    this.setState({ responses: newResponses });
-
+  handleResponse = () => {
+    const { currentQuestionIndex } = this.state;
     if (currentQuestionIndex < 6) {
       this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
     } else {
-      // All questions answered
       alert('All questions answered. You can submit now.');
     }
   };
@@ -43,22 +39,49 @@ class Questionnaire extends Component {
 
   handleInputChange = (event) => {
     const { name, value } = event.target;
-    this.setState({ [name]: value });
+    this.setState(prevState => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        [name]: value
+      }
+    }));
   };
 
   handleCheckboxChange = (event) => {
     const { checked } = event.target;
-    this.setState({ termsAccepted: checked });
+    this.setState(prevState => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        termsAccepted: checked
+      }
+    }));
+  };
+
+  handleClear = () => {
+    this.setState({
+      Questionnaire_Response: {
+        firstName: '',
+        lastName: '',
+        companyName: '',
+        companyShortCode: '',
+        country: '',
+        baseCurrency: '',
+        financialYear: '',
+        accountingPeriodMonth: '',
+        accountingPeriodYear: '',
+        termsAccepted: false
+      }
+    });
   };
 
   handleSubmit = () => {
-    console.log('User responses:', this.state.responses);
+    const { Questionnaire_Response } = this.state;
+    console.log('User responses:', Questionnaire_Response);
     // Add logic to handle the submission of responses
-    // This can include API calls or further processing of collected data
   };
 
   render() {
-    const { currentQuestionIndex } = this.state;
+    const { currentQuestionIndex, Questionnaire_Response } = this.state;
     const progressPercentage = ((currentQuestionIndex + 1) / 7) * 100;
 
     const questions = [
@@ -88,7 +111,7 @@ class Questionnaire extends Component {
         <div className="greeting">
           <h2>Nice to meet you Praveen!</h2>
         </div>
-       
+
         <div className="question">
           <h1>{questions[currentQuestionIndex]}</h1>
           <p>Your answer will help us to give you the best start.</p>
@@ -98,7 +121,7 @@ class Questionnaire extends Component {
                 type="text"
                 name="firstName"
                 placeholder="First name"
-                value={this.state.firstName}
+                value={Questionnaire_Response.firstName}
                 onChange={this.handleInputChange}
                 className="input-field"
               />
@@ -106,7 +129,7 @@ class Questionnaire extends Component {
                 type="text"
                 name="lastName"
                 placeholder="Last name"
-                value={this.state.lastName}
+                value={Questionnaire_Response.lastName}
                 onChange={this.handleInputChange}
                 className="input-field"
               />
@@ -118,7 +141,7 @@ class Questionnaire extends Component {
                 type="text"
                 name="companyName"
                 placeholder="Company Name"
-                value={this.state.companyName}
+                value={Questionnaire_Response.companyName}
                 onChange={this.handleInputChange}
                 className="input-field"
               />
@@ -126,7 +149,7 @@ class Questionnaire extends Component {
                 type="text"
                 name="companyShortCode"
                 placeholder="Company Short Code"
-                value={this.state.companyShortCode}
+                value={Questionnaire_Response.companyShortCode}
                 onChange={this.handleInputChange}
                 className="input-field"
               />
@@ -137,7 +160,7 @@ class Questionnaire extends Component {
               type="text"
               name="country"
               placeholder="Country"
-              value={this.state.country}
+              value={Questionnaire_Response.country}
               onChange={this.handleInputChange}
               className="input-field"
             />
@@ -147,7 +170,7 @@ class Questionnaire extends Component {
               type="text"
               name="baseCurrency"
               placeholder="Base Currency"
-              value={this.state.baseCurrency}
+              value={Questionnaire_Response.baseCurrency}
               onChange={this.handleInputChange}
               className="input-field"
             />
@@ -155,7 +178,7 @@ class Questionnaire extends Component {
           {currentQuestionIndex === 4 && (
             <select
               name="financialYear"
-              value={this.state.financialYear}
+              value={Questionnaire_Response.financialYear}
               onChange={this.handleInputChange}
               className="input-field"
             >
@@ -167,21 +190,19 @@ class Questionnaire extends Component {
             <div className="accounting-period-inputs">
               <select
                 name="accountingPeriodMonth"
-                value={this.state.accountingPeriodMonth}
+                value={Questionnaire_Response.accountingPeriodMonth}
                 onChange={this.handleInputChange}
                 className="input-field"
               >
-                {/* Options for months */}
                 <option value="January">January</option>
                 {/* Add other months */}
               </select>
               <select
                 name="accountingPeriodYear"
-                value={this.state.accountingPeriodYear}
+                value={Questionnaire_Response.accountingPeriodYear}
                 onChange={this.handleInputChange}
                 className="input-field"
               >
-                {/* Options for years */}
                 <option value="2024">2024</option>
                 {/* Add other years */}
               </select>
@@ -193,7 +214,7 @@ class Questionnaire extends Component {
                 type="checkbox"
                 id="termsCheckbox"
                 name="termsAccepted"
-                checked={this.state.termsAccepted}
+                checked={Questionnaire_Response.termsAccepted}
                 onChange={this.handleCheckboxChange}
                 className="checkbox-input"
               />
@@ -206,14 +227,14 @@ class Questionnaire extends Component {
         <div className="response-buttons">
           {currentQuestionIndex !== 6 && (
             <>
-              <button onClick={() => this.handleResponse('Yes')} className="response-button">Yes</button>
-              <button onClick={() => this.handleResponse('No')} className="response-button">No</button>
+              <button onClick={this.handleClear} className="response-button">Clear</button>
+              <button onClick={this.handleResponse} className="response-button">Next</button>
             </>
           )}
           {currentQuestionIndex === 6 && (
             <button
               onClick={this.handleSubmit}
-              disabled={!this.state.termsAccepted}
+              disabled={!Questionnaire_Response.termsAccepted}
               className="submit-button"
             >
               Complete Sign-up
