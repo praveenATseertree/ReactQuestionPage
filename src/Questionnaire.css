@@ -1,23 +1,11 @@
+/* Questionnaire.css */
+
 .questionnaire-container {
   text-align: center;
   padding: 50px;
   font-family: Arial, sans-serif;
   position: relative; /* Add this line */
 }
-
-/*.progress-bar-container {
-  width: 100%;
-  background-color: #f3f3f3;
-  height: 30px;
-  margin-bottom: 20px;
-  border-radius: 15px;
-  overflow: hidden;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 999;
-}*/
 
 .progress-bar-container {
   width: 100%;
@@ -34,7 +22,6 @@
   z-index: 999;
 }
 
-
 .progress-bar {
   height: 100%;
   background: linear-gradient(to right, #2a7cba, #1a5fba); /* Blue gradient */
@@ -44,7 +31,8 @@
   justify-content: center;
   color: white;
   font-weight: bold;
-  border-radius: 15px;
+  border-top-right-radius: 15px; /* Match parent container */
+  border-bottom-right-radius: 15px; /* Match parent container */
 }
 
 .progress-text {
@@ -136,16 +124,6 @@
   cursor: not-allowed;
 }
 
-/*.input-field {
-  display: block;
-  width: 50%;
-  margin: 10px auto;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #cccccc;
-  border-radius: 5px;
-}*/
-
 .input-field {
   display: block;
   width: 40%;
@@ -165,11 +143,8 @@
   box-shadow: 0 0 5px rgba(42, 124, 186, 0.5); /* Shadow effect on focus */
 }
 
-
-
 .checkbox-input {
   margin-right: 10px;
-  padding: 20px;
 }
 
 .terms-label {
