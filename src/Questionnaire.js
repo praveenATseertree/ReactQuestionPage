@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import ReactCountryFlagsSelect from 'react-country-flags-select';
 import './Questionnaire.css';
+import { blue } from '@mui/material/colors';
+
 
 class Questionnaire extends Component {
   constructor(props) {
@@ -11,7 +17,7 @@ class Questionnaire extends Component {
         lastName: '',
         companyName: '',
         companyShortCode: '',
-        country: '',
+        country: null, // Initialize as null
         baseCurrency: '',
         financialYear: '',
         accountingPeriodMonth: '',
@@ -47,6 +53,15 @@ class Questionnaire extends Component {
     }));
   };
 
+  handleCountrySelect = (selectedCountry) => {
+    this.setState(prevState => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        country: selectedCountry
+      }
+    }));
+  };
+
   handleCheckboxChange = (event) => {
     const { checked } = event.target;
     this.setState(prevState => ({
@@ -64,7 +79,7 @@ class Questionnaire extends Component {
         lastName: '',
         companyName: '',
         companyShortCode: '',
-        country: '',
+        country: null,
         baseCurrency: '',
         financialYear: '',
         accountingPeriodMonth: '',
@@ -156,14 +171,17 @@ class Questionnaire extends Component {
             </div>
           )}
           {currentQuestionIndex === 2 && (
-            <input
-              type="text"
-              name="country"
-              placeholder="Country"
-              value={Questionnaire_Response.country}
-              onChange={this.handleInputChange}
-              className="input-field"
-            />
+            <div className="centered-country-selector">
+              <ReactCountryFlagsSelect
+                selected={Questionnaire_Response.country}
+                onSelect={this.handleCountrySelect}
+                optionsListMaxHeight={300}
+                searchable
+                selectWidth={500}
+                selectHeight={40}
+                className="country-select"
+              />
+            </div>
           )}
           {currentQuestionIndex === 3 && (
             <input
@@ -194,8 +212,19 @@ class Questionnaire extends Component {
                 onChange={this.handleInputChange}
                 className="input-field"
               >
+                <option value="Select Option">Select Month</option>
                 <option value="January">January</option>
-                {/* Add other months */}
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
               </select>
               <select
                 name="accountingPeriodYear"
