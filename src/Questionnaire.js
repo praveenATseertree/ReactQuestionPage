@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import TextField from '@mui/material/TextField';
 import ReactCountryFlagsSelect from 'react-country-flags-select';
+import dayjs from 'dayjs';
 import './Questionnaire.css';
-import { blue } from '@mui/material/colors';
-
 
 class Questionnaire extends Component {
   constructor(props) {
@@ -17,11 +17,11 @@ class Questionnaire extends Component {
         lastName: '',
         companyName: '',
         companyShortCode: '',
-        country: null, // Initialize as null
+        country: null,
         baseCurrency: '',
         financialYear: '',
-        accountingPeriodMonth: '',
         accountingPeriodYear: '',
+        accountingPeriodMonth: '',
         termsAccepted: false
       }
     };
@@ -49,6 +49,16 @@ class Questionnaire extends Component {
       Questionnaire_Response: {
         ...prevState.Questionnaire_Response,
         [name]: value
+      }
+    }));
+  };
+
+  handleDateChange = (date) => {
+    this.setState(prevState => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        accountingPeriodYear: date.year(),
+        accountingPeriodMonth: date.month() + 1 // month() returns 0-11, so adding 1 to make it 1-12
       }
     }));
   };
@@ -82,8 +92,8 @@ class Questionnaire extends Component {
         country: null,
         baseCurrency: '',
         financialYear: '',
-        accountingPeriodMonth: '',
         accountingPeriodYear: '',
+        accountingPeriodMonth: '',
         termsAccepted: false
       }
     });
@@ -205,36 +215,18 @@ class Questionnaire extends Component {
             </select>
           )}
           {currentQuestionIndex === 5 && (
-            <div className="accounting-period-inputs">
-              <select
-                name="accountingPeriodMonth"
-                value={Questionnaire_Response.accountingPeriodMonth}
-                onChange={this.handleInputChange}
-                className="input-field"
-              >
-                <option value="Select Option">Select Month</option>
-                <option value="January">January</option>
-                <option value="February">February</option>
-                <option value="March">March</option>
-                <option value="April">April</option>
-                <option value="May">May</option>
-                <option value="June">June</option>
-                <option value="July">July</option>
-                <option value="August">August</option>
-                <option value="September">September</option>
-                <option value="October">October</option>
-                <option value="November">November</option>
-                <option value="December">December</option>
-              </select>
-              <select
-                name="accountingPeriodYear"
-                value={Questionnaire_Response.accountingPeriodYear}
-                onChange={this.handleInputChange}
-                className="input-field"
-              >
-                <option value="2024">2024</option>
-                {/* Add other years */}
-              </select>
+            <div className='DateMontn-selector'>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DatePicker
+                views={['year', 'month']}
+                label="Year and Month"
+                minDate={dayjs('2012-03-01')}
+                maxDate={dayjs('2023-06-01')}
+                value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
+                onChange={this.handleDateChange}
+                renderInput={(params) => <TextField {...params} helperText={null} />}
+              />
+            </LocalizationProvider>
             </div>
           )}
           {currentQuestionIndex === 6 && (
