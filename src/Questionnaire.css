@@ -70,20 +70,21 @@
   margin: 20px 0;
 }
 
-
-
-.country-select .react-country-flag-selector {
+.centered-country-selector .react-country-flag-selector,
+.DateMonth-selector .react-country-flag-selector {
   border: 1px solid #ccc;
   border-radius: 4px;
   padding: 8px;
   width: 100%;
 }
 
-.country-select .react-country-flag-selector:focus {
+.centered-country-selector .react-country-flag-selector:focus,
+.DateMonth-selector .react-country-flag-selector:focus {
   border-color: #2a7cba !important;
   outline: none;
   box-shadow: 0 0 5px rgba(42, 124, 186, 0.5);
 }
+
 .greeting {
   margin-top: 40px;
 }
@@ -174,6 +175,6 @@
   color: #7f8c8d;
 }
 
-.DateMonth-selector{
-  margin-top: 10px;
+.DateMonth-selector {
+  margin-top: 30px; /* Adjust this value to move the field lower */
 }

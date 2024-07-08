@@ -23,14 +23,18 @@ class Questionnaire extends Component {
         accountingPeriodYear: '',
         accountingPeriodMonth: '',
         termsAccepted: false
-      }
+      },
+      errors: {} // to track validation errors
     };
   }
 
   handleResponse = () => {
     const { currentQuestionIndex } = this.state;
     if (currentQuestionIndex < 6) {
-      this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
+      if (this.validateForm()) {
+        this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
+      }
+      // No need for an else here because validateForm() will handle the error display
     } else {
       alert('All questions answered. You can submit now.');
     }
@@ -95,7 +99,8 @@ class Questionnaire extends Component {
         accountingPeriodYear: '',
         accountingPeriodMonth: '',
         termsAccepted: false
-      }
+      },
+      errors: {} // Clear errors when clearing form
     });
   };
 
@@ -105,8 +110,82 @@ class Questionnaire extends Component {
     // Add logic to handle the submission of responses
   };
 
+  validateForm = () => {
+    const { Questionnaire_Response } = this.state;
+    let valid = true;
+    const errors = {};
+
+    if (this.state.currentQuestionIndex === 0) {
+      if (!Questionnaire_Response.firstName.trim()) {
+        errors.firstName = 'First name is required.';
+        valid = false;
+      } else {
+        errors.firstName = '';
+      }
+      if (!Questionnaire_Response.lastName.trim()) {
+        errors.lastName = 'Last name is required.';
+        valid = false;
+      } else {
+        errors.lastName = '';
+      }
+    } else if (this.state.currentQuestionIndex === 1) {
+      if (!Questionnaire_Response.companyName.trim()) {
+        errors.companyName = 'Company Name is required.';
+        valid = false;
+      } else {
+        errors.companyName = '';
+      }
+      if (!Questionnaire_Response.companyShortCode.trim()) {
+        errors.companyShortCode = 'Company Short Code is required.';
+        valid = false;
+      } else {
+        errors.companyShortCode = '';
+      }
+    } else if (this.state.currentQuestionIndex === 2) {
+      if (!Questionnaire_Response.country) {
+        errors.country = 'Country is required.';
+        valid = false;
+      } else {
+        errors.country = '';
+      }
+    } else if (this.state.currentQuestionIndex === 3) {
+      if (!Questionnaire_Response.baseCurrency.trim()) {
+        errors.baseCurrency = 'Base Currency is required.';
+        valid = false;
+      } else {
+        errors.baseCurrency = '';
+      }
+    } else if (this.state.currentQuestionIndex === 4) {
+      if (!Questionnaire_Response.financialYear.trim()) {
+        errors.financialYear = 'Financial Year is required.';
+        valid = false;
+      } else {
+        errors.financialYear = '';
+      }
+    } else if (this.state.currentQuestionIndex === 5) {
+      if (!Questionnaire_Response.accountingPeriodYear || !Questionnaire_Response.accountingPeriodMonth) {
+        errors.accountingPeriodYear = 'Accounting Period is required.';
+        errors.accountingPeriodMonth = 'Accounting Period is required.';
+        valid = false;
+      } else {
+        errors.accountingPeriodYear = '';
+        errors.accountingPeriodMonth = '';
+      }
+    } else if (this.state.currentQuestionIndex === 6) {
+      if (!Questionnaire_Response.termsAccepted) {
+        errors.termsAccepted = 'Please accept the Terms and Conditions.';
+        valid = false;
+      } else {
+        errors.termsAccepted = '';
+      }
+    }
+
+    this.setState({ errors });
+    return valid;
+  };
+
   render() {
-    const { currentQuestionIndex, Questionnaire_Response } = this.state;
+    const { currentQuestionIndex, Questionnaire_Response, errors } = this.state;
     const progressPercentage = ((currentQuestionIndex + 1) / 7) * 100;
 
     const questions = [
@@ -145,19 +224,21 @@ class Questionnaire extends Component {
               <input
                 type="text"
                 name="firstName"
-                placeholder="First name"
+                placeholder="First name *"
                 value={Questionnaire_Response.firstName}
                 onChange={this.handleInputChange}
-                className="input-field"
+                className={`input-field ${errors.firstName && 'input-error'}`}
               />
+              {errors.firstName && <span className="error-message">{errors.firstName}</span>}
               <input
                 type="text"
                 name="lastName"
-                placeholder="Last name"
+                placeholder="Last name *"
                 value={Questionnaire_Response.lastName}
                 onChange={this.handleInputChange}
-                className="input-field"
+                className={`input-field ${errors.lastName && 'input-error'}`}
               />
+              {errors.lastName && <span className="error-message">{errors.lastName}</span>}
             </div>
           )}
           {currentQuestionIndex === 1 && (
@@ -165,19 +246,21 @@ class Questionnaire extends Component {
               <input
                 type="text"
                 name="companyName"
-                placeholder="Company Name"
+                placeholder="Company Name *"
                 value={Questionnaire_Response.companyName}
                 onChange={this.handleInputChange}
-                className="input-field"
+                className={`input-field ${errors.companyName && 'input-error'}`}
               />
+              {errors.companyName && <span className="error-message">{errors.companyName}</span>}
               <input
                 type="text"
                 name="companyShortCode"
-                placeholder="Company Short Code"
+                placeholder="Company Short Code *"
                 value={Questionnaire_Response.companyShortCode}
                 onChange={this.handleInputChange}
-                className="input-field"
+                className={`input-field ${errors.companyShortCode && 'input-error'}`}
               />
+              {errors.companyShortCode && <span className="error-message">{errors.companyShortCode}</span>}
             </div>
           )}
           {currentQuestionIndex === 2 && (
@@ -189,18 +272,19 @@ class Questionnaire extends Component {
                 searchable
                 selectWidth={500}
                 selectHeight={40}
-                className="country-select"
+                className={`country-select ${errors.country && 'input-error'}`}
               />
+              {errors.country && <span className="error-message">{errors.country}</span>}
             </div>
           )}
           {currentQuestionIndex === 3 && (
             <input
               type="text"
               name="baseCurrency"
-              placeholder="Base Currency"
+              placeholder="Base Currency *"
               value={Questionnaire_Response.baseCurrency}
               onChange={this.handleInputChange}
-              className="input-field"
+              className={`input-field ${errors.baseCurrency && 'input-error'}`}
             />
           )}
           {currentQuestionIndex === 4 && (
@@ -208,8 +292,9 @@ class Questionnaire extends Component {
               name="financialYear"
               value={Questionnaire_Response.financialYear}
               onChange={this.handleInputChange}
-              className="input-field"
+              className={`input-field ${errors.financialYear && 'input-error'}`}
             >
+              <option value="">Select Financial Year *</option>
               <option value="Jan-Dec">Jan-Dec</option>
               <option value="Apr-Mar">Apr-Mar</option>
             </select>
@@ -219,14 +304,17 @@ class Questionnaire extends Component {
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DatePicker
                 views={['year', 'month']}
-                label="Year and Month"
+                label="Year and Month *"
                 minDate={dayjs('2012-03-01')}
                 maxDate={dayjs('2023-06-01')}
                 value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
                 onChange={this.handleDateChange}
                 renderInput={(params) => <TextField {...params} helperText={null} />}
+                className={`input-field ${errors.accountingPeriodYear && 'input-error'}`}
               />
             </LocalizationProvider>
+            {errors.accountingPeriodYear && <span className="error-message">{errors.accountingPeriodYear}</span>}
+            {errors.accountingPeriodMonth && <span className="error-message">{errors.accountingPeriodMonth}</span>}
             </div>
           )}
           {currentQuestionIndex === 6 && (
@@ -237,11 +325,12 @@ class Questionnaire extends Component {
                 name="termsAccepted"
                 checked={Questionnaire_Response.termsAccepted}
                 onChange={this.handleCheckboxChange}
-                className="checkbox-input"
+                className={`checkbox-input ${errors.termsAccepted && 'input-error'}`}
               />
               <label htmlFor="termsCheckbox" className="terms-label">
-                I agree to the Terms and Conditions
+                I agree to the Terms and Conditions *
               </label>
+              {errors.termsAccepted && <span className="error-message">{errors.termsAccepted}</span>}
             </div>
           )}
         </div>
