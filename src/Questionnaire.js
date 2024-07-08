@@ -29,22 +29,17 @@ class Questionnaire extends Component {
   }
 
   handleResponse = () => {
-    const { currentQuestionIndex } = this.state;
-    if (currentQuestionIndex < 6) {
-      if (this.validateForm()) {
-        this.setState({ currentQuestionIndex: currentQuestionIndex + 1 });
-      }
-      // No need for an else here because validateForm() will handle the error display
-    } else {
-      alert('All questions answered. You can submit now.');
+    if (this.validateForm()) {
+      this.setState(prevState => ({
+        currentQuestionIndex: prevState.currentQuestionIndex + 1
+      }));
     }
   };
 
   handleBack = () => {
-    const { currentQuestionIndex } = this.state;
-    if (currentQuestionIndex > 0) {
-      this.setState({ currentQuestionIndex: currentQuestionIndex - 1 });
-    }
+    this.setState(prevState => ({
+      currentQuestionIndex: prevState.currentQuestionIndex - 1
+    }));
   };
 
   handleInputChange = (event) => {
@@ -186,7 +181,7 @@ class Questionnaire extends Component {
 
   render() {
     const { currentQuestionIndex, Questionnaire_Response, errors } = this.state;
-    const progressPercentage = ((currentQuestionIndex + 1) / 7) * 100;
+    const progressPercentage = ((currentQuestionIndex + 1) / 8) * 100; // updated calculation
 
     const questions = [
       'Confirm your first name and last name',
@@ -218,7 +213,7 @@ class Questionnaire extends Component {
 
         <div className="question">
           <h1>{questions[currentQuestionIndex]}</h1>
-          <p>Your answer will help us to give you the best start.</p>
+          {currentQuestionIndex < 6 && <p>Your answer will help us to give you the best start.</p>}
           {currentQuestionIndex === 0 && (
             <div className="name-inputs">
               <input
@@ -300,21 +295,21 @@ class Questionnaire extends Component {
             </select>
           )}
           {currentQuestionIndex === 5 && (
-            <div className='DateMontn-selector'>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                views={['year', 'month']}
-                label="Year and Month *"
-                minDate={dayjs('2012-03-01')}
-                maxDate={dayjs('2023-06-01')}
-                value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
-                onChange={this.handleDateChange}
-                renderInput={(params) => <TextField {...params} helperText={null} />}
-                className={`input-field ${errors.accountingPeriodYear && 'input-error'}`}
-              />
-            </LocalizationProvider>
-            {errors.accountingPeriodYear && <span className="error-message">{errors.accountingPeriodYear}</span>}
-            {errors.accountingPeriodMonth && <span className="error-message">{errors.accountingPeriodMonth}</span>}
+            <div className="DateMontn-selector">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  views={['year', 'month']}
+                  label="Year and Month *"
+                  minDate={dayjs('2012-03-01')}
+                  maxDate={dayjs('2023-06-01')}
+                  value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
+                  onChange={this.handleDateChange}
+                  renderInput={(params) => <TextField {...params} helperText={null} />}
+                  className={`input-field ${errors.accountingPeriodYear && 'input-error'}`}
+                />
+              </LocalizationProvider>
+              {errors.accountingPeriodYear && <span className="error-message">{errors.accountingPeriodYear}</span>}
+              {errors.accountingPeriodMonth && <span className="error-message">{errors.accountingPeriodMonth}</span>}
             </div>
           )}
           {currentQuestionIndex === 6 && (
