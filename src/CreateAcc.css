@@ -1,0 +1,126 @@
+.create-acc-body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+}
+
+.create-acc-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    margin: 0;
+}
+
+.create-acc-form-container {
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    width: 400px; /* Adjust width as needed */
+}
+
+.create-acc-form-container h2 {
+    margin-bottom: 20px;
+}
+
+.create-acc-form-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.create-acc-form-container input[type="email"],
+.create-acc-form-container .btn,
+.create-acc-social-login button {
+    padding: 15px; /* Increase padding for larger input and button */
+    margin-bottom: 20px;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px; /* Increase font size for better readability */
+}
+
+.create-acc-form-container input[type="email"] {
+    border: 1px solid #ddd;
+}
+
+.create-acc-form-container .btn {
+    background-color: #17AD9C;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.create-acc-form-container .btn:hover {
+    background-color: #218838;
+}
+
+.create-acc-form-container p {
+    margin-top: 10px;
+}
+
+.create-acc-form-container a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.create-acc-form-container a:hover {
+    text-decoration: underline;
+}
+
+.create-acc-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+}
+
+.create-acc-divider::before,
+.create-acc-divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.create-acc-divider::before {
+    margin-right: .25em;
+}
+
+.create-acc-divider::after {
+    margin-left: .25em;
+}
+
+.create-acc-social-login {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.create-acc-social-login button {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 15px; /* Increase padding for larger button */
+    border: 1px solid #ddd; 
+    border-radius: 4px; 
+    cursor: pointer;
+    width: 100%;
+    background-color: white;
+    font-size: 16px; /* Increase font size for better readability */
+}
+
+.create-acc-social-login .icon {
+    margin-right: 10px;
+}
+
+.create-acc-social-login .google,
+.create-acc-social-login .microsoft,
+.create-acc-social-login .apple {
+    color: black;
+}
