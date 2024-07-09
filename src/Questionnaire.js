@@ -31,7 +31,8 @@ class Questionnaire extends Component {
         termsAccepted: false
       },
       errors: {},
-      isTermsDialogOpen: false // State to manage the modal visibility
+      isTermsDialogOpen: false, // State to manage the modal visibility
+      isSuccessDialogOpen: false // State to manage the success dialog visibility
     };
   }
 
@@ -49,7 +50,7 @@ class Questionnaire extends Component {
     }));
   };
 
-  handleInputChange = (event) => {
+  /*handleInputChange = (event) => {
     const { name, value } = event.target;
     this.setState(prevState => ({
       Questionnaire_Response: {
@@ -57,7 +58,22 @@ class Questionnaire extends Component {
         [name]: value
       }
     }));
+  };*/
+
+  handleInputChange = (event) => {
+    const { name, value } = event.target;
+  
+    // Capitalize the first letter of input if it's not empty
+    const capitalizedValue = value.charAt(0).toUpperCase() + value.slice(1);
+  
+    this.setState(prevState => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        [name]: capitalizedValue
+      }
+    }));
   };
+  
 
   handleDateChange = (date) => {
     this.setState(prevState => ({
@@ -88,7 +104,7 @@ class Questionnaire extends Component {
     }));
   };
 
-  handleClear = () => {
+  /* handleClear = () => {
     this.setState({
       Questionnaire_Response: {
         firstName: '',
@@ -104,12 +120,53 @@ class Questionnaire extends Component {
       },
       errors: {}
     });
-  };
+  }; */
 
+  handleClear = () => {
+    const { currentQuestionIndex, Questionnaire_Response } = this.state;
+    const updatedResponse = { ...Questionnaire_Response };
+  
+    // Clear fields based on current question index
+    switch (currentQuestionIndex) {
+      case 0:
+        updatedResponse.firstName = '';
+        updatedResponse.lastName = '';
+        break;
+      case 1:
+        updatedResponse.companyName = '';
+        updatedResponse.companyShortCode = '';
+        break;
+      case 2:
+        updatedResponse.country = null;
+        break;
+      case 3:
+        updatedResponse.baseCurrency = '';
+        break;
+      case 4:
+        updatedResponse.financialYear = '';
+        break;
+      case 5:
+        updatedResponse.accountingPeriodYear = '';
+        updatedResponse.accountingPeriodMonth = '';
+        break;
+      case 6:
+        updatedResponse.termsAccepted = false;
+        break;
+      default:
+        break;
+    }
+  
+    this.setState({
+      Questionnaire_Response: updatedResponse,
+      errors: {}
+    });
+  };
+  
   handleSubmit = () => {
     const { Questionnaire_Response } = this.state;
     console.log('User responses:', Questionnaire_Response);
     // Add logic to handle the submission of responses
+    this.setState({ isSuccessDialogOpen: true });
   };
 
   validateForm = () => {
@@ -191,8 +248,13 @@ class Questionnaire extends Component {
     this.setState(prevState => ({ isTermsDialogOpen: !prevState.isTermsDialogOpen }));
   };
 
+  // Function to close the success dialog
+  closeSuccessDialog = () => {
+    this.setState({ isSuccessDialogOpen: false });
+  };
+
   render() {
-    const { currentQuestionIndex, Questionnaire_Response, errors, isTermsDialogOpen } = this.state;
+    const { currentQuestionIndex, Questionnaire_Response, errors, isTermsDialogOpen, isSuccessDialogOpen } = this.state;
     const progressPercentage = ((currentQuestionIndex + 1) / 8) * 100;
 
     const questions = [
@@ -221,11 +283,12 @@ class Questionnaire extends Component {
 
         <div className="greeting">
           <h2>Nice to meet you Praveen!</h2>
+          <p>Your answer will help us to give you the best start.</p>
         </div>
 
         <div className="question">
           <h1>{questions[currentQuestionIndex]}</h1>
-          {currentQuestionIndex < 6 && <p>Your answer will help us to give you the best start.</p>}
+          {currentQuestionIndex < 6 }
           {currentQuestionIndex === 0 && (
             <div className="name-inputs">
               <input
@@ -335,7 +398,7 @@ class Questionnaire extends Component {
                 className={`checkbox-input ${errors.termsAccepted && 'input-error'}`}
               />
               <label htmlFor="termsCheckbox" className="terms-label">
-                I agree to the <a href="#" onClick={this.toggleTermsDialog}>Terms and Conditions</a> *
+                I agree to the <span className="terms-link" onClick={this.toggleTermsDialog}>Terms and Conditions</span> *
               </label>
               {errors.termsAccepted && <span className="error-message">{errors.termsAccepted}</span>}
             </div>
@@ -362,9 +425,10 @@ class Questionnaire extends Component {
         <Dialog
           open={isTermsDialogOpen}
           onClose={this.toggleTermsDialog}
+          classes={{ paper: 'terms-dialog' }}
         >
-          <DialogTitle>Terms and Conditions</DialogTitle>
-          <DialogContent>
+          <DialogTitle className="terms-dialog-title">Terms and Conditions</DialogTitle>
+          <DialogContent className="terms-dialog-content">
             <DialogContentText>
               Terms of use
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
@@ -382,8 +446,24 @@ class Questionnaire extends Component {
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
             </DialogContentText>
           </DialogContent>
-          <DialogActions>
+          <DialogActions className="terms-dialog-actions">
             <Button onClick={this.toggleTermsDialog} color="primary">Close</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={isSuccessDialogOpen}
+          onClose={this.closeSuccessDialog}
+          classes={{ paper: 'success-dialog' }}
+        >
+          <DialogTitle className="success-dialog-title">Profile Completed</DialogTitle>
+          <DialogContent className="success-dialog-content">
+            <DialogContentText>
+              Profile completed successfully.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions className="success-dialog-actions">
+            <Button onClick={this.closeSuccessDialog} color="primary">Close</Button>
           </DialogActions>
         </Dialog>
       </div>
