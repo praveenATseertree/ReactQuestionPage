@@ -5,6 +5,12 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import TextField from '@mui/material/TextField';
 import ReactCountryFlagsSelect from 'react-country-flags-select';
 import dayjs from 'dayjs';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import './Questionnaire.css';
 
 class Questionnaire extends Component {
@@ -24,7 +30,8 @@ class Questionnaire extends Component {
         accountingPeriodMonth: '',
         termsAccepted: false
       },
-      errors: {} // to track validation errors
+      errors: {},
+      isTermsDialogOpen: false // State to manage the modal visibility
     };
   }
 
@@ -95,7 +102,7 @@ class Questionnaire extends Component {
         accountingPeriodMonth: '',
         termsAccepted: false
       },
-      errors: {} // Clear errors when clearing form
+      errors: {}
     });
   };
 
@@ -179,9 +186,14 @@ class Questionnaire extends Component {
     return valid;
   };
 
+  // Function to toggle the modal visibility
+  toggleTermsDialog = () => {
+    this.setState(prevState => ({ isTermsDialogOpen: !prevState.isTermsDialogOpen }));
+  };
+
   render() {
-    const { currentQuestionIndex, Questionnaire_Response, errors } = this.state;
-    const progressPercentage = ((currentQuestionIndex + 1) / 8) * 100; // updated calculation
+    const { currentQuestionIndex, Questionnaire_Response, errors, isTermsDialogOpen } = this.state;
+    const progressPercentage = ((currentQuestionIndex + 1) / 8) * 100;
 
     const questions = [
       'Confirm your first name and last name',
@@ -323,7 +335,7 @@ class Questionnaire extends Component {
                 className={`checkbox-input ${errors.termsAccepted && 'input-error'}`}
               />
               <label htmlFor="termsCheckbox" className="terms-label">
-                I agree to the Terms and Conditions *
+                I agree to the <a href="#" onClick={this.toggleTermsDialog}>Terms and Conditions</a> *
               </label>
               {errors.termsAccepted && <span className="error-message">{errors.termsAccepted}</span>}
             </div>
@@ -346,6 +358,34 @@ class Questionnaire extends Component {
             </button>
           )}
         </div>
+
+        <Dialog
+          open={isTermsDialogOpen}
+          onClose={this.toggleTermsDialog}
+        >
+          <DialogTitle>Terms and Conditions</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Terms of use
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
+              <br /><br />
+              Intellectual property rights
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
+              <br /><br />
+              Prohibited activities
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
+              <br /><br />
+              Termination clause
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
+              <br /><br />
+              Governing law
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tenetur, quidem doloribus cumque vero, culpa voluptates dolorum reprehenderit nihil nisi odit necessitatibus voluptate voluptatibus magni ducimus sed accusamus illo nobis veniam.
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.toggleTermsDialog} color="primary">Close</Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   }
