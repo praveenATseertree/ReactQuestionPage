@@ -38,7 +38,7 @@
 .create-acc-form-container input[type="email"],
 .create-acc-form-container .btn,
 .create-acc-social-login button {
-    padding: 15px; /* Increase padding for larger input and button */
+    padding: 10px; /* Increase padding for larger input and button */
     margin-bottom: 20px;
     width: 100%;
     border: 1px solid #ddd;
@@ -105,8 +105,8 @@
 .create-acc-social-login button {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding: 15px; /* Increase padding for larger button */
+    justify-content: center; /* Center the content horizontally */
+    padding: 12px; /* Increase padding for larger button */
     border: 1px solid #ddd; 
     border-radius: 4px; 
     cursor: pointer;
@@ -115,8 +115,14 @@
     font-size: 16px; /* Increase font size for better readability */
 }
 
+.icon-text-container {
+    display: flex;
+    align-items: center;
+}
+
 .create-acc-social-login .icon {
     margin-right: 10px;
+    font-size: 24px;
 }
 
 .create-acc-social-login .google,
