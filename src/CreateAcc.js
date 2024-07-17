@@ -5,6 +5,7 @@ import { FaApple } from "react-icons/fa";
 import { TiVendorMicrosoft } from "react-icons/ti";
 import { useGoogleLogin } from '@react-oauth/google';
 import { useMsal } from '@azure/msal-react';
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 class CreateAcc extends Component {
     handleGoogleClick = () => {
@@ -12,11 +13,31 @@ class CreateAcc extends Component {
         googleLogin();
     };
 
-    handleMicrosoftClick = () => {
+    handleMicrosoftClick = async () => {
         const { msalInstance } = this.props;
-        msalInstance.loginRedirect({
-            scopes: ["User.Read"]
-        }).catch(error => console.log('Login Failed:', error));
+        try {
+            const loginResponse = await msalInstance.loginRedirect({
+                scopes: ["User.Read"]
+            });
+            const account = msalInstance.getActiveAccount();
+            if (account) {
+                const tokenResponse = await msalInstance.acquireTokenSilent({
+                    scopes: ["User.Read"],
+                    account
+                });
+                sessionStorage.setItem('msalToken', tokenResponse.accessToken);
+                console.log('Microsoft User Details:', account);
+                window.location.href = '/request';
+            }
+        } catch (error) {
+            if (error instanceof InteractionRequiredAuthError) {
+                msalInstance.acquireTokenRedirect({
+                    scopes: ["User.Read"]
+                });
+            } else {
+                console.log('Login Failed:', error);
+            }
+        }
     };
 
     componentDidMount() {
@@ -70,7 +91,8 @@ const withGoogleLogin = (Component) => {
         const googleLogin = useGoogleLogin({
             clientId: "974473418001-ure7o939s0spafpsk8dij9ds73d48egu.apps.googleusercontent.com",
             onSuccess: tokenResponse => {
-                localStorage.setItem('googleToken', tokenResponse.access_token);
+                console.log('Google User Details:', tokenResponse);
+                sessionStorage.setItem('googleToken', tokenResponse.access_token);
                 window.location.href = '/request';
             },
             onError: error => console.log('Login Failed:', error)
