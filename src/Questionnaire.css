@@ -10,7 +10,7 @@
 .progress-bar-container {
   width: 100%;
   background-color: #f3f3f3;
-  height: 20px;
+  height: 15px;
   margin-bottom: 20px;
   border-top-right-radius: 15px; /* Rounded only on the right side */
   border-bottom-right-radius: 15px; /* Rounded only on the right side */
@@ -39,7 +39,7 @@
   position: absolute;
   width: 100%;
   text-align: center;
-  font-size: 14px;
+  font-size: 10px;
 }
 
 .header {
