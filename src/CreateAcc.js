@@ -3,9 +3,15 @@ import './CreateAcc.css';
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
 import { TiVendorMicrosoft } from "react-icons/ti";
+<<<<<<< HEAD
 import { InteractionRequiredAuthError } from "@azure/msal-browser";
 import withGoogleLogin from './withGoogleLogin';
 import withMsal from './withMsal';
+=======
+import { useGoogleLogin } from '@react-oauth/google';
+import { useMsal } from '@azure/msal-react';
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
+>>>>>>> cc58e6caec1133e0b162c6763673c114f8caf269
 
 class CreateAcc extends Component {
     handleGoogleClick = () => {
@@ -16,7 +22,11 @@ class CreateAcc extends Component {
     handleMicrosoftClick = async () => {
         const { msalInstance } = this.props;
         try {
+<<<<<<< HEAD
             await msalInstance.loginRedirect({
+=======
+            const loginResponse = await msalInstance.loginRedirect({
+>>>>>>> cc58e6caec1133e0b162c6763673c114f8caf269
                 scopes: ["User.Read"]
             });
             const account = msalInstance.getActiveAccount();
@@ -25,6 +35,7 @@ class CreateAcc extends Component {
                     scopes: ["User.Read"],
                     account
                 });
+<<<<<<< HEAD
                 const userInfo = await fetch('https://graph.microsoft.com/v1.0/me', {
                     headers: {
                         'Authorization': `Bearer ${tokenResponse.accessToken}`
@@ -33,6 +44,10 @@ class CreateAcc extends Component {
 
                 console.log('Microsoft User Details:', userInfo);
                 sessionStorage.setItem('msalToken', tokenResponse.accessToken);
+=======
+                sessionStorage.setItem('msalToken', tokenResponse.accessToken);
+                console.log('Microsoft User Details:', account);
+>>>>>>> cc58e6caec1133e0b162c6763673c114f8caf269
                 window.location.href = '/request';
             }
         } catch (error) {
@@ -92,4 +107,31 @@ class CreateAcc extends Component {
     }
 }
 
+<<<<<<< HEAD
 export default withGoogleLogin(withMsal(CreateAcc));
+=======
+const withGoogleLogin = (Component) => {
+    return (props) => {
+        const googleLogin = useGoogleLogin({
+            clientId: "974473418001-ure7o939s0spafpsk8dij9ds73d48egu.apps.googleusercontent.com",
+            onSuccess: tokenResponse => {
+                console.log('Google User Details:', tokenResponse);
+                sessionStorage.setItem('googleToken', tokenResponse.access_token);
+                window.location.href = '/request';
+            },
+            onError: error => console.log('Login Failed:', error)
+        });
+
+        return <Component {...props} googleLogin={googleLogin} />;
+    };
+};
+
+const withMsal = (Component) => {
+    return (props) => {
+        const { instance } = useMsal();
+        return <Component {...props} msalInstance={instance} />;
+    };
+};
+
+export default withGoogleLogin(withMsal(CreateAcc));
+>>>>>>> cc58e6caec1133e0b162c6763673c114f8caf269
