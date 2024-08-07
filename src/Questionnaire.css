@@ -1,10 +1,8 @@
-/* Questionnaire.css */
-
 .questionnaire-container {
   text-align: center;
   padding: 50px;
   font-family: Arial, sans-serif;
-  position: relative; /* Add this line */
+  position: relative;
 }
 
 .progress-bar-container {
@@ -12,8 +10,8 @@
   background-color: #f3f3f3;
   height: 15px;
   margin-bottom: 20px;
-  border-top-right-radius: 15px; /* Rounded only on the right side */
-  border-bottom-right-radius: 15px; /* Rounded only on the right side */
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
   overflow: hidden;
   position: fixed;
   top: 0;
@@ -31,8 +29,8 @@
   justify-content: center;
   color: white;
   font-weight: bold;
-  border-top-right-radius: 15px; /* Match parent container */
-  border-bottom-right-radius: 15px; /* Match parent container */
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
 }
 
 .progress-text {
@@ -46,12 +44,12 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 50px; /* Add this line to give space from top */
+  margin-top: 50px;
 }
 
 .back-button {
   position: absolute;
-  top: 50px; /* Adjust the position as needed */
+  top: 50px;
   left: 20px;
 }
 
@@ -66,20 +64,43 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 10px;
+  font-size: 50px;
   width: 100%;
-  margin: 20px 0;
+  /* margin: 20px 80px; */
+  margin-left: 450px;
 }
 
-.centered-country-selector .react-country-flag-selector,
-.DateMonth-selector .react-country-flag-selector {
+.country-select {
+  width: 300px !important; /* Default width */
+  height: 50px !important; /* Default height */
+}
+
+/* Increase size of the country select component */
+.country-select-large {
+  width: 800px !important; /* Set your desired width */
+  height: 70px !important; /* Set your desired height */
+}
+
+.react-country-dropdown__select {
+  width: 100% !important; /* Ensure the select box takes full width */
+  height: 100% !important; /* Ensure the select box takes full height */
+}
+
+.react-country-dropdown__options {
+  width: 100% !important; /* Ensure the options list aligns with the width of the select box */
+}
+
+.react-country-flag-selector {
   border: 1px solid #ccc;
   border-radius: 4px;
-  padding: 8px;
+  padding: 10px;
+  font-size: 16px;
   width: 100%;
+  height: 100%; /* Ensure height is applied */
 }
 
-.centered-country-selector .react-country-flag-selector:focus,
-.DateMonth-selector .react-country-flag-selector:focus {
+.react-country-flag-selector:focus {
   border-color: #2a7cba !important;
   outline: none;
   box-shadow: 0 0 5px rgba(42, 124, 186, 0.5);
@@ -107,12 +128,6 @@
   font-size: 28px;
   color: #2c3e50;
 }
-
-/*.question p {
-  margin-top: 10px;
-  font-size: 18px;
-  color: #7f8c8d;
-}*/
 
 .response-buttons {
   margin-top: 30px;
@@ -158,17 +173,17 @@
   margin: 10px auto;
   padding: 10px;
   font-size: 16px;
-  border: 1px solid #cccccc; /* Default border color */
+  border: 1px solid #cccccc;
   border-radius: 5px;
   background-color: white;
-  color: #2c3e50; /* Default text color */
-  transition: border-color 0.3s, box-shadow 0.3s; /* Transition for smooth effect */
+  color: #2c3e50;
+  transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .input-field:focus {
-  border-color: #2a7cba; /* Blue border color on focus */
-  outline: none; /* Remove default outline */
-  box-shadow: 0 0 5px rgba(42, 124, 186, 0.5); /* Shadow effect on focus */
+  border-color: #2a7cba;
+  outline: none;
+  box-shadow: 0 0 5px rgba(42, 124, 186, 0.5);
 }
 
 .checkbox-input {
@@ -181,10 +196,8 @@
 }
 
 .DateMonth-selector {
-  margin-top: 30px; /* Adjust this value to move the field lower */
+  margin-top: 30px;
 }
-
-/* Questionnaire.css */
 
 .terms-dialog {
   max-width: 600px;
@@ -240,4 +253,33 @@
 
 .success-dialog-actions {
   justify-content: center;
+}
+
+.input-error {
+  border-color: red; /* Add additional error styles if needed */
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+}
+
+.country-select {
+  width: 100% !important; /* Ensure width is applied */
+  height: 100% !important; /* Ensure height is applied */
+  max-width: 500px; /* Set maximum width for responsiveness */
+  max-height: 60px; /* Set maximum height for responsiveness */
+}
+
+.loading-overlay {
+  position: fixed; /* Sticks the overlay to the viewport */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center; /* Centers horizontally */
+  align-items: center; /* Centers vertically */
+  background-color: rgba(255, 255, 255, 0.8); /* Optional: Slightly opaque background */
+  z-index: 9999; /* Ensures the loader is on top of other content */
 }

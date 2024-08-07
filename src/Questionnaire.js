@@ -12,6 +12,40 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import './Questionnaire.css';
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import PulseLoader from 'react-spinners/PulseLoader';
+import { ReactCountryDropdown } from 'react-country-dropdown';
+import { Password } from 'primereact/password';
+import 'react-country-dropdown/dist/index.css';
+import { PasswordField } from '@aws-amplify/ui-react';
+import { Select, MenuItem, FormControl, InputLabel, FormHelperText } from '@mui/material';
+
+const countryCurrencyMapping = {
+  'United Arab Emirates': 'AED',
+  'China': 'CNY',
+  'Russia': 'RUB',
+  'Sri Lanka': 'LKR',
+  'Singapore': 'SGD',
+  'Malaysia': 'MYR',
+  'Saudi Arabia': 'SAR',
+  'Kuwait': 'KWD',
+  'Qatar': 'QAR',
+  'Australia': 'AUD',
+  'Bangladesh': 'BDT',
+  'Brazil': 'BRL',
+  'Canada': 'CAD',
+  'Hong Kong': 'HKD',
+  'India': 'INR',
+  'Italy': 'EUR',
+  'Japan': 'JPY',
+  'New Zealand': 'NZD',
+  'Pakistan': 'PKR',
+  'Peru': 'PEN',
+  'Philippines': 'PHP',
+  'United States of America': 'USD',
+  'United Kingdom of Great Britain and Northern Ireland': 'GBP',
+};
 
 class Questionnaire extends Component {
   constructor(props) {
@@ -28,21 +62,87 @@ class Questionnaire extends Component {
         financialYear: '',
         accountingPeriodYear: '',
         accountingPeriodMonth: '',
+        password: '',
+        confirmPassword: '',
         termsAccepted: false
       },
-      errors: {},
+      username: '',
+      errors: {
+        passwordMismatch: '',
+        country: '',
+        baseCurrency: '',
+      },
+      passwordMatch: true,
       isTermsDialogOpen: false, // State to manage the modal visibility
-      isSuccessDialogOpen: false // State to manage the success dialog visibility
+      isSuccessDialogOpen: false,
+      loading: false // State to manage the success dialog visibility
     };
   }
+  
+    componentDidMount() {
+      const email = this.getEmailFromSession();
+      if (email) {
+        const userInfo = this.extractUserInfo(email);
+        this.setState(prevState => ({
+          Questionnaire_Response: {
+            ...prevState.Questionnaire_Response, // Preserve existing state
+            firstName: userInfo.firstName,
+            lastName: userInfo.lastName,
+            companyName: userInfo.companyName
+          },
+          userEmail: email
+        }));
+      } else {
+        this.setState({ userEmail: 'No email found' });
+      }
+    }
+    
+ 
+  getEmailFromSession = () => {
+    const userEmail = sessionStorage.getItem('userEmail');
+    const userMEmail = sessionStorage.getItem('userMEmail');
+    const userEMailID = sessionStorage.getItem('userEMailID');
+    const email = userEmail || userMEmail || userEMailID;
+    
+    this.setState({ username: email }, () => {
+      console.log('extracted mailid:', this.state.username);
+    });
+  
+    return email;
+  };
+  
+  
+
+
+  extractUserInfo = (email) => {
+    const [localPart, domainPart] = email.split('@');
+    if (!domainPart) {
+      // Handle cases where the email format is incorrect
+      return {
+        firstName: localPart,
+        lastName: '',
+        companyName: ''
+      };
+    }
+    
+    const [firstName, lastName] = localPart.split('.');
+    const companyName = domainPart.split('.')[0];
+  
+    return {
+      firstName: firstName || localPart,
+      lastName: lastName || '',
+      companyName: companyName || ''
+    };
+  };
 
   handleResponse = () => {
     if (this.validateForm()) {
       this.setState(prevState => ({
-        currentQuestionIndex: prevState.currentQuestionIndex + 1
+        currentQuestionIndex: prevState.currentQuestionIndex + 1,
       }));
     }
   };
+
 
   handleBack = () => {
     this.setState(prevState => ({
@@ -50,15 +150,6 @@ class Questionnaire extends Component {
     }));
   };
 
-  /*handleInputChange = (event) => {
-    const { name, value } = event.target;
-    this.setState(prevState => ({
-      Questionnaire_Response: {
-        ...prevState.Questionnaire_Response,
-        [name]: value
-      }
-    }));
-  };*/
 
   handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -85,12 +176,32 @@ class Questionnaire extends Component {
     }));
   };
 
-  handleCountrySelect = (selectedCountry) => {
-    this.setState(prevState => ({
+  
+  handleCountrySelect = (event) => {
+    const selectedCountryName = event.target.value;
+    const defaultFinancialYear = selectedCountryName === 'India' ? 'Apr-Mar' : 'Jan-Dec';
+    
+    // Calculate the default accounting period date
+    const currentYear = dayjs().year();
+    const defaultAccountingPeriod = defaultFinancialYear === 'Apr-Mar'
+      ? dayjs(`${currentYear}-04-01`)
+      : dayjs(`${currentYear}-01-01`);
+    
+    const baseCurrency = countryCurrencyMapping[selectedCountryName] || this.state.Questionnaire_Response.baseCurrency;
+    
+    this.setState((prevState) => ({
       Questionnaire_Response: {
         ...prevState.Questionnaire_Response,
-        country: selectedCountry
-      }
+        country: selectedCountryName,
+        baseCurrency: baseCurrency,
+        financialYear: defaultFinancialYear,
+        accountingPeriodYear: defaultAccountingPeriod.year(), // Store the year
+        accountingPeriodMonth: defaultAccountingPeriod.month() + 1, // Store the month (month is zero-based)
+      },
+      errors: {
+        ...prevState.errors,
+        country: '', // Clear any existing errors when a country is selected
+      },
     }));
   };
 
@@ -104,24 +215,7 @@ class Questionnaire extends Component {
     }));
   };
 
-  /* handleClear = () => {
-    this.setState({
-      Questionnaire_Response: {
-        firstName: '',
-        lastName: '',
-        companyName: '',
-        companyShortCode: '',
-        country: null,
-        baseCurrency: '',
-        financialYear: '',
-        accountingPeriodYear: '',
-        accountingPeriodMonth: '',
-        termsAccepted: false
-      },
-      errors: {}
-    });
-  }; */
-
+  
   handleClear = () => {
     const { currentQuestionIndex, Questionnaire_Response } = this.state;
     const updatedResponse = { ...Questionnaire_Response };
@@ -162,11 +256,142 @@ class Questionnaire extends Component {
     });
   };
   
-  handleSubmit = () => {
-    const { Questionnaire_Response } = this.state;
+  // handlePasswordChange = (event) => {
+  //   const { name, value } = event.target;
+  //   this.setState((prevState) => {
+  //     const updatedResponse = {
+  //       ...prevState.Questionnaire_Response,
+  //       [name]: value,
+  //     };
+
+  //     return {
+  //       Questionnaire_Response: updatedResponse,
+  //       passwordMatch: updatedResponse.password === updatedResponse.confirmPassword,
+  //     };
+  //   });
+  // };
+
+  handlePasswordChange = (event) => {
+    const { name, value } = event.target;
+    this.setState((prevState) => ({
+      Questionnaire_Response: {
+        ...prevState.Questionnaire_Response,
+        [name]: value
+      }
+    }));
+  };
+  
+  
+  getCurrentDate = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  handleSubmit = async () => {
+    this.setState({ loading: true }); // Start the spinner
+
+    const { Questionnaire_Response, username } = this.state;
+    const { password, confirmPassword } = Questionnaire_Response;
+
+  // Check if passwords match
+  if (password !== confirmPassword) {
+    Swal.fire({
+      title: 'Password Mismatch',
+      text: 'Passwords do not match. Please try again.',
+      icon: 'error',
+      showConfirmButton: false
+    });
+    this.setState({ loading: false }); // Stop the spinner
+    return; // Exit the function without submitting
+  }
+
+
+    // Log the user responses
     console.log('User responses:', Questionnaire_Response);
-    // Add logic to handle the submission of responses
-    this.setState({ isSuccessDialogOpen: true });
+
+    const dataToSend = {
+      p_first_name: String(Questionnaire_Response.firstName || ''), // Ensure this is a string
+      p_last_name: String(Questionnaire_Response.lastName || ''), // Ensure this is a string
+      p_company_name: String(Questionnaire_Response.companyName || ''), // Ensure this is a string
+      p_company_short_code: String(Questionnaire_Response.companyShortCode || ''), // Ensure this is a string
+      p_country: String(Questionnaire_Response.country ? Questionnaire_Response.country.label : ''), // Ensure this is a string
+      p_base_currency: String(Questionnaire_Response.baseCurrency || ''), // Ensure this is a string
+      p_financial_year: String(Questionnaire_Response.financialYear || ''), // Ensure this is a string
+      p_accounting_period_year: String(Questionnaire_Response.accountingPeriodYear || ''), // Ensure this is a string
+      p_user_email: String(username ? String(username) : ''), // Ensure this is a string
+      p_accounting_period_month: String(Questionnaire_Response.accountingPeriodMonth || ''), // Ensure this is a string
+      p_terms_accepted: String(Questionnaire_Response.termsAccepted), // Ensure this is a string
+      p_domain_name: String(Questionnaire_Response.companyName || ''), // Ensure this is a string
+      p_start_date: this.getCurrentDate(), // Ensure this is a string
+      p_end_date: this.getCurrentDate(),
+      p_created_by: String(Questionnaire_Response.firstName || ''), // Ensure this is a string
+      p_creation_date: this.getCurrentDate(), // Pass the current date
+      p_last_update_date: this.getCurrentDate(), // Ensure this is a string
+      p_last_updated_by: String(Questionnaire_Response.firstName || ''), // Ensure this is a string
+      p_password:String(Questionnaire_Response.password)
+    };
+
+    console.log('Data to be sent:', dataToSend);
+
+    // Define the API endpoint
+    const apiUrl = 'http://localhost:8080/Kuber_Fixed/RegisteruserApi';
+
+    try {
+      // Make the HTTP POST request using axios
+      const response = await axios.post(apiUrl, { data: dataToSend });
+
+      // Check if response status code is 200
+      if (response.status === 200) {
+        const status = response.data?.Output?.[0]?.Status;
+        if (status === 'TRUE') {
+          Swal.fire({
+            title: 'Profile Created',
+            text: 'Data submitted successfully!',
+            icon: 'success',
+            showConfirmButton: false
+          });
+          window.location.href = "/redirect";
+        } else {
+          Swal.fire({
+            title: 'User Already found',
+            text: 'Submission failed!',
+            icon: 'error',
+            showConfirmButton: false
+          });
+        }
+      } else {
+        Swal.fire({
+          title: 'Error',
+          text: 'Unexpected status code received.',
+          icon: 'error',
+          showConfirmButton: false
+        });
+      }
+    } catch (error) {
+      // Log detailed error response
+      if (error.response) {
+        console.error('API Response Error:', error.response.data);
+        Swal.fire({
+          title: 'Error',
+          text: error.response.data.Error || 'Error response received from the server',
+          icon: 'error',
+          showConfirmButton: false
+        });
+      } else {
+        console.error('Network Error:', error.message);
+        Swal.fire({
+          title: 'Error',
+          text: 'Network error occurred',
+          icon: 'error',
+          showConfirmButton: false
+        });
+      }
+    } finally {
+      this.setState({ loading: false }); // Stop the spinner
+    }
   };
 
   validateForm = () => {
@@ -253,9 +478,57 @@ class Questionnaire extends Component {
     this.setState({ isSuccessDialogOpen: false });
   };
 
+  // handlePasswordChange = (event) => {
+  //   console.log('Password Change:', event.target.name, event.target.value); // Debug
+  //   const { name, value } = event.target;
+  //   this.setState(prevState => ({
+  //     Questionnaire_Response: {
+  //       ...prevState.Questionnaire_Response,
+  //       [name]: value
+  //     }
+  //   }));
+  // };
+  // handlePasswordChange = (event) => {
+  //   const { name, value } = event.target;
+  //   this.setState({ [name]: value }, this.validatePasswords);
+  // };
+
+  // validatePasswords = () => {
+  //   const { password, confirmPassword } = this.state;
+  //   if (password !== confirmPassword) {
+  //     this.setState({ errors: { passwordMismatch: 'Passwords do not match' } });
+  //   } else {
+  //     this.setState({ errors: { passwordMismatch: '' } });
+  //   }
+  // };
+
+
   render() {
-    const { currentQuestionIndex, Questionnaire_Response, errors, isTermsDialogOpen, isSuccessDialogOpen } = this.state;
-    const progressPercentage = ((currentQuestionIndex + 1) / 8) * 100;
+    const {loading,currentQuestionIndex, Questionnaire_Response, errors, isTermsDialogOpen, isSuccessDialogOpen } = this.state;
+
+    const { password, confirmPassword } = this.state.Questionnaire_Response;
+    const { passwordMatch } = this.state;
+   // const progressPercentage = ((currentQuestionIndex + 1) / 7) * 100;
+   const totalQuestions = 8; // Total number of questions
+   const progressPercentage = (currentQuestionIndex / (totalQuestions - 1)) * 100;
+    console.log(currentQuestionIndex)
+    console.log(progressPercentage)
+    const { firstName } = Questionnaire_Response;
+    console.log('Session Storage:', sessionStorage.getItem('authindicator'));
+    const authindicator = JSON.parse(sessionStorage.getItem('authindicator'));
+    console.log('Parsed authindicator:', authindicator);
+    
+    console.log('authindicator',authindicator)
+    // const questions = [
+    //   'Confirm your first name and last name',
+    //   'Please enter the name of your Company',
+    //   'Please select your Country',
+    //   'Please select your Base Currency',
+    //   'Please select your Financial Year',
+    //   'What would you like your first accounting period to be?',
+    //   'Please enter your password',
+    //   'Before we get started, please take a moment to review and accept our Terms and Conditions'
+    // ];
 
     const questions = [
       'Confirm your first name and last name',
@@ -264,6 +537,7 @@ class Questionnaire extends Component {
       'Please select your Base Currency',
       'Please select your Financial Year',
       'What would you like your first accounting period to be?',
+      'Please enter your password and accept our Terms and Conditions',
       'Before we get started, please take a moment to review and accept our Terms and Conditions'
     ];
 
@@ -282,7 +556,7 @@ class Questionnaire extends Component {
         </div>
 
         <div className="greeting">
-          <h2>Nice to meet you Praveen!</h2>
+          <h2>Nice to meet you {firstName}!</h2>
           <p>Your answer will help us to give you the best start.</p>
         </div>
 
@@ -333,20 +607,31 @@ class Questionnaire extends Component {
               {errors.companyShortCode && <span className="error-message">{errors.companyShortCode}</span>}
             </div>
           )}
-          {currentQuestionIndex === 2 && (
-            <div className="centered-country-selector">
-              <ReactCountryFlagsSelect
-                selected={Questionnaire_Response.country}
-                onSelect={this.handleCountrySelect}
-                optionsListMaxHeight={300}
-                searchable
-                selectWidth={500}
-                selectHeight={40}
-                className={`country-select ${errors.country && 'input-error'}`}
-              />
-              {errors.country && <span className="error-message">{errors.country}</span>}
-            </div>
-          )}
+           {currentQuestionIndex === 2 && (
+                <div className="centered-country-selector">
+                  <FormControl
+                    variant="outlined"
+                    error={!!errors.country}
+                    style={{ width: '100%' }}
+                  >
+                    <InputLabel>Please select a country</InputLabel>
+                    <Select
+                      value={Questionnaire_Response.country}
+                      onChange={this.handleCountrySelect}
+                      label="Please select a country"
+                      style={{ width: '100%', height: '70px' }}
+                      className={`country-select ${errors.country && 'input-error'}`}
+                    >
+                      {Object.keys(countryCurrencyMapping).map((country) => (
+                        <MenuItem key={country} value={country}>
+                          {country}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {errors.country && <FormHelperText>{errors.country}</FormHelperText>}
+                  </FormControl>
+                </div>
+                )}
           {currentQuestionIndex === 3 && (
             <input
               type="text"
@@ -369,24 +654,121 @@ class Questionnaire extends Component {
               <option value="Apr-Mar">Apr-Mar</option>
             </select>
           )}
-          {currentQuestionIndex === 5 && (
-            <div className="DateMontn-selector">
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  views={['year', 'month']}
-                  label="Year and Month *"
-                  minDate={dayjs('2012-03-01')}
-                  maxDate={dayjs('2023-06-01')}
-                  value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
-                  onChange={this.handleDateChange}
-                  renderInput={(params) => <TextField {...params} helperText={null} />}
-                  className={`input-field ${errors.accountingPeriodYear && 'input-error'}`}
-                />
-              </LocalizationProvider>
-              {errors.accountingPeriodYear && <span className="error-message">{errors.accountingPeriodYear}</span>}
-              {errors.accountingPeriodMonth && <span className="error-message">{errors.accountingPeriodMonth}</span>}
+            {currentQuestionIndex === 5 && (
+              <div className="DateMontn-selector">  
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    views={['year', 'month']}
+                    label="select Accounting period *"
+                    minDate={dayjs('2012-03-01')}
+                    maxDate={dayjs('3000-01-01')}
+                    value={dayjs(`${Questionnaire_Response.accountingPeriodYear}-${Questionnaire_Response.accountingPeriodMonth}-01`)}
+                    onChange={this.handleDateChange}
+                    renderInput={(params) => <TextField {...params} helperText={null} />}
+                    className={`input-field ${errors.accountingPeriodYear && 'input-error'}`}
+                  />
+                </LocalizationProvider>
+                {errors.accountingPeriodYear && <span className="error-message">{errors.accountingPeriodYear}</span>}
+                {errors.accountingPeriodMonth && <span className="error-message">{errors.accountingPeriodMonth}</span>}
+              </div>
+            )}
+
+          
+        {/* {currentQuestionIndex === 6 && authindicator && (
+          <div className="password-section">
+            <div className="password-fields">
+                                <Password
+                      value={Questionnaire_Response.password}
+                      onChange={this.handlePasswordChange}
+                      name="password"
+                      // placeholder="Password *"
+                    />
+                    <Password
+                      value={Questionnaire_Response.confirmPassword}
+                      onChange={this.handlePasswordChange}
+                      name="confirmPassword"
+                      // placeholder="Confirm Password *"
+                    />
+              {errors.passwordMismatch && <span className="error-message">{errors.passwordMismatch}</span>}
             </div>
-          )}
+          </div>
+        )} */}
+
+          {/* {currentQuestionIndex === 6 && authindicator && (
+            <div style={{ display: 'flex', gap: '10px',marginLeft:'510px',alignItems:'center' }}>
+            <input
+              type="password"
+              name="password"
+              value={password}
+              onChange={this.handlePasswordChange}
+              placeholder="Password*"
+              required
+              style={{ width: '200px', padding: '10px', fontSize: '14px' }}
+            />
+            <br/>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={confirmPassword}
+              onChange={this.handlePasswordChange}
+              placeholder="Confirm Password*"
+              required
+              style={{ width: '200px', padding: '10px', fontSize: '14px' }}
+            />
+          </div>
+          
+          )} */}
+
+{currentQuestionIndex === 6 && authindicator && (
+  <div
+    style={{
+      display: 'flex',
+      flexDirection: 'column', // Stack elements vertically
+      gap: '5px',
+      marginLeft: '0px',
+      alignItems: 'center'
+    }}
+  >
+    
+    <input
+      type="password"
+      name="password"
+      value={password}
+      onChange={this.handlePasswordChange}
+      placeholder="Password*"
+      required
+      style={{
+        width: '250px',
+        padding: '10px',
+        fontSize: '14px',
+        borderColor: '#87CEEB', // A darker shade of sky blue
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        boxShadow: '0 0 5px rgba(70, 130, 180, 0.5)'
+      }}
+    />
+    <input
+      type="password"
+      name="confirmPassword"
+      value={confirmPassword}
+      onChange={this.handlePasswordChange}
+      placeholder="Confirm Password*"
+      required
+      style={{
+        width: '250px',
+        padding: '10px',
+        fontSize: '14px',
+        borderColor: '#87CEEB', // A darker shade of sky blue
+        borderWidth: '1px',
+        borderStyle: 'solid',
+        boxShadow: '0 0 5px rgba(70, 130, 180, 0.5)'
+      }}
+    />
+  </div>
+)}
+
+
+
           {currentQuestionIndex === 6 && (
             <div className="terms-inputs">
               <input
@@ -407,19 +789,34 @@ class Questionnaire extends Component {
         <div className="response-buttons">
           {currentQuestionIndex !== 6 && (
             <>
+               
+              {currentQuestionIndex > 0 && <button onClick={this.handleBack} className="response-button" >Back</button>}
               <button onClick={this.handleClear} className="response-button">Clear</button>
               <button onClick={this.handleResponse} className="response-button">Next</button>
             </>
           )}
           {currentQuestionIndex === 6 && (
-            <button
-              onClick={this.handleSubmit}
-              disabled={!Questionnaire_Response.termsAccepted}
-              className="submit-button"
-            >
-              Complete Sign-up
-            </button>
-          )}
+          <button
+          onClick={this.handleSubmit}
+          disabled={!Questionnaire_Response.termsAccepted}
+          className="submit-button"
+        >
+          Complete Sign-up
+        </button>
+      )}
+      {loading && (
+          <div className="loading-overlay">
+            <PulseLoader
+              size={15}
+              margin={2}
+              color={"#045D8C"}
+              loading={loading}
+              cssOverride={{ display: 'block', margin: '0 auto' }}
+              speedMultiplier={1}
+            />
+            {/*<p className="loading-text">Loading...</p>*/}
+          </div>
+        )}
         </div>
 
         <Dialog
@@ -448,22 +845,6 @@ class Questionnaire extends Component {
           </DialogContent>
           <DialogActions className="terms-dialog-actions">
             <Button onClick={this.toggleTermsDialog} color="primary">Close</Button>
-          </DialogActions>
-        </Dialog>
-
-        <Dialog
-          open={isSuccessDialogOpen}
-          onClose={this.closeSuccessDialog}
-          classes={{ paper: 'success-dialog' }}
-        >
-          <DialogTitle className="success-dialog-title">Profile Completed</DialogTitle>
-          <DialogContent className="success-dialog-content">
-            <DialogContentText>
-              Profile completed successfully.
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions className="success-dialog-actions">
-            <Button onClick={this.closeSuccessDialog} color="primary">Close</Button>
           </DialogActions>
         </Dialog>
       </div>

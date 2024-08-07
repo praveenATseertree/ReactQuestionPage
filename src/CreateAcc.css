@@ -8,6 +8,11 @@
     margin: 0;
 }
 
+.logo {
+    width: 150px; /* Adjust size as needed */
+    margin-bottom: 20px; /* Space between logo and form */
+}
+
 .create-acc-container {
     display: flex;
     justify-content: center;
@@ -47,7 +52,7 @@
 }
 
 .create-acc-form-container input[type="email"] {
-    border: 1px solid #ddd;
+    border: 1px solid #0d0101;
 }
 
 .create-acc-form-container .btn {
@@ -58,7 +63,7 @@
 }
 
 .create-acc-form-container .btn:hover {
-    background-color: #218838;
+    background-color: #04596e;
 }
 
 .create-acc-form-container p {
@@ -74,7 +79,7 @@
     text-decoration: underline;
 }
 
-.create-acc-divider {
+/* .create-acc-divider {
     display: flex;
     align-items: center;
     text-align: center;
@@ -90,11 +95,30 @@
 
 .create-acc-divider::before {
     margin-right: .25em;
-}
-
+} */
+/* 
 .create-acc-divider::after {
     margin-left: .25em;
-}
+} */
+.create-acc-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #0d0101; /* Color for the text */
+    margin: 20px 0; /* Adjust margin as needed */
+  }
+  
+  .create-acc-divider::before,
+  .create-acc-divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 2px solid #0d0101; /* Color for the line */
+  }
+  
+  .create-acc-divider span {
+    padding: 0 10px; /* Space around the text */
+    font-weight: bold; /* Optional: Make text bold */
+  }
 
 .create-acc-social-login {
     display: flex;
@@ -107,7 +131,7 @@
     align-items: center;
     justify-content: center; /* Center the content horizontally */
     padding: 12px; /* Increase padding for larger button */
-    border: 1px solid #ddd; 
+    border: 1px solid #0d0101; 
     border-radius: 4px; 
     cursor: pointer;
     width: 100%;
@@ -130,3 +154,47 @@
 .create-acc-social-login .apple {
     color: black;
 }
+
+input[type="email"],
+input[type="password"] {
+    width: 100%; /* Ensure both inputs take the full width of their container */
+    padding: 10px; /* Add consistent padding */
+    margin: 5px 0; /* Add consistent margin between inputs */
+    border: 1px solid #ccc; /* Add a border to make inputs visually consistent */
+    border-radius: 4px; /* Optional: Add rounded corners */
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+    margin-bottom: 30px;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+    color: #888; /* Optional: Customize placeholder text color */
+}
+
+/* New CSS for loading overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    z-index: 1000; /* Ensure it appears above other content */
+}
+
+.loading-overlay {
+    position: fixed; /* Sticks the overlay to the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    background-color: rgba(255, 255, 255, 0.8); /* Optional: Slightly opaque background */
+    z-index: 9999; /* Ensures the loader is on top of other content */
+  }
+  

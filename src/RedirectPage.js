@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { Bars } from 'react-loading-icons'
 
 const RedirectPage = () => {
     const location = useLocation();
@@ -42,6 +43,7 @@ const RedirectPage = () => {
         <div>
             <h2>RedirectPage</h2>
             <p>Redirected successful</p>
+            <Bars />
         </div>
     );
 };
